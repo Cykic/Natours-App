@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
 process.on('uncaughtException', err => {
+  // eslint-disable-next-line no-console
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+  // eslint-disable-next-line no-console
   console.log(err.name, err.message);
   process.exit(1);
 });
@@ -21,7 +23,10 @@ mongoose
     useCreateIndex: true,
     useFindAndModify: false
   })
-  .then(() => console.log('DB connection successful!'));
+  .then(() => {
+    // eslint-disable-next-line no-console
+    console.log('DB connection successful!');
+  });
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {
