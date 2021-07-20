@@ -12,6 +12,25 @@ const generateToken = user =>
     expiresIn: process.env.JWT_EXPIRATION
   });
 
+const sendLoginToken = (user, statuscode, res) => {
+  const token = generateToken(user);
+  const cookieOption = {
+    expires: new Date(
+      Date.now() + process.env.JWT_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+
+    httpOnly: true
+  };
+
+  if (process.env.NODE_ENV === 'production') cookieOption.secure = true;
+  // cookie
+  res.cookie('jwt', token, cookieOption);
+
+  res.status(statuscode).json({
+    status: 'success',
+    token
+  });
+};
 exports.signup = catchAsync(async (req, res) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -22,16 +41,9 @@ exports.signup = catchAsync(async (req, res) => {
   });
 
   // creating JWT for signup userModel
-  const token = generateToken(newUser);
 
   // CREATED SUCCESSFUL
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser
-    }
-  });
+  sendLoginToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -44,17 +56,13 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // check if the email and password parameters match any existing user
   const user = await User.findOne({ email }).select('+password');
+  if (!user) return next(new AppError('No Account found for this Email', 404));
 
-  const correctPassword = await bcrypt.compare(password, user.password);
-  if (!user || !correctPassword)
-    return next(new AppError('Invalid Email or Password', 401));
+  const isPasswordCorrect = await user.correctPassword(password, user.password);
+  if (!user || !isPasswordCorrect)
+    return next(new AppError('Incorrect Email or Password', 401));
 
-  const token = generateToken(user);
-
-  res.status(200).json({
-    status: 'success',
-    token
-  });
+  sendLoginToken(user, 200, res);
 });
 
 exports.protected = catchAsync(async (req, res, next) => {
@@ -150,10 +158,27 @@ exports.resetpassword = catchAsync(async (req, res, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
   // Log the user in send JWT
-  const token = generateToken(user);
+  sendLoginToken(user, 200, res);
+});
 
-  res.status(200).json({
-    status: 'success',
-    token
-  });
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1.) Get user
+  const user = await User.findById(req.user.id).select('+password');
+  // 2.) check if password is correctPassword
+  const correctPassword = await bcrypt.compare(
+    req.body.currentPassword,
+    user.password
+  );
+  if (!correctPassword)
+    return next(
+      new AppError('current password is incorrect please try again', 401)
+    );
+
+  // 3.) if so, update password
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  await user.save(); // this is because validator only work on save or create
+
+  // 4.) Log in user
+  sendLoginToken(user, 200, res);
 });
