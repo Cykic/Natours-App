@@ -5,9 +5,6 @@ class APIFeatures {
   }
 
   filter() {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(this.queryString);
-    }
     const queryObj = { ...this.queryString };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach(el => delete queryObj[el]);
