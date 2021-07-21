@@ -62,14 +62,16 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// 3) ROUTES
+// 3) ROUTES TO END POINTS
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
+// ERROR PAGE 404
 app.all('*', (req, _res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
+// GLOBAL ERROR HANDLER
 app.use(globalErrorHandler);
 
 module.exports = app;
