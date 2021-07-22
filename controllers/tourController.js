@@ -47,6 +47,10 @@ exports.getTour = catchAsync(async (req, res, next) => {
 exports.createTour = catchAsync(async (req, res, next) => {
   const newTour = await Tour.create(req.body);
 
+  // Error to create New tour
+  if (!newTour)
+    return next(new AppError('Cannot Create new Tour, try again', 400));
+
   res.status(201).json({
     status: 'success',
     data: {
@@ -67,9 +71,7 @@ exports.updateTour = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: {
-      tour
-    }
+    data: { tour }
   });
 });
 
