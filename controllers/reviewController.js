@@ -1,26 +1,29 @@
 const catchAsync = require('../utils/catchAsync');
 const Review = require('../models/reviewModel');
 const AppError = require('./../utils/appError');
+const factory = require('./handlerFactory');
 
 exports.getAllReview = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find();
+  let filter = {};
+  if (req.params.tourId) filter = { tour: req.params.tourId };
+  const reviews = await Review.find(filter);
 
   if (!reviews) return next(new AppError('Cannot get reviews try again', 400));
 
   res.status(200).json({
     status: 'success',
+    results: reviews.length,
     data: { reviews }
   });
 });
 
-exports.createNewReview = catchAsync(async (req, res, next) => {
-  const review = await Review.create(req.body);
+exports.setTourUserIds = (req, res, next) => {
+  // Allow Nested Route
+  if (!req.body.tour) req.body.tour = req.params.tourId;
+  if (!req.body.user) req.body.user = req.user.id;
+  next();
+};
 
-  if (!review)
-    return next(new AppError('Review cannot be created, try again', 400));
-
-  res.status(201).json({
-    status: 'success',
-    data: { review }
-  });
-});
+exports.createNewReview = factory.createOne(Review);
+exports.updateReview = factory.updateOne(Review);
+exports.deleteReview = factory.deleteOne(Review);

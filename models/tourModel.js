@@ -109,7 +109,11 @@ const tourSchema = new mongoose.Schema(
     toObject: { virtuals: true }
   }
 );
-
+tourSchema.virtual('reviews', {
+  ref: 'review',
+  foreignField: 'tour',
+  localField: '_id'
+});
 tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
@@ -146,6 +150,7 @@ tourSchema.pre(/^find/, function(next) {
 });
 
 tourSchema.post(/^find/, function(docs, next) {
+  // eslint-disable-next-line no-console
   console.log(`Query took ${Date.now() - this.start} milliseconds!`);
   next();
 });
@@ -154,6 +159,7 @@ tourSchema.post(/^find/, function(docs, next) {
 tourSchema.pre('aggregate', function(next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
 
+  // eslint-disable-next-line no-console
   console.log(this.pipeline());
   next();
 });
