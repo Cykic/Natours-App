@@ -1,7 +1,9 @@
 const fs = require('fs');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const Tour = require('../../src/tours/tourModel');
+const Tour = require('../../src/tour/tourModel');
+const Review = require('../../src/review/reviewModel');
+const User = require('../../src/user/userModel');
 
 dotenv.config({ path: './config.env' });
 
@@ -17,6 +19,7 @@ mongoose
     useFindAndModify: false,
     useUnifiedTopology: true
   })
+  // eslint-disable-next-line no-console
   .then(() => console.log('DB connection successful!'));
 
 // READ JSON FILE
@@ -30,8 +33,12 @@ const reviews = JSON.parse(
 const importData = async () => {
   try {
     await Tour.create(tours);
+    await User.create(users);
+    await Review.create(reviews);
+    // eslint-disable-next-line no-console
     console.log('Data successfully loaded!');
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.log(err);
   }
   process.exit();

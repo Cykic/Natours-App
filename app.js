@@ -8,9 +8,9 @@ const hpp = require('hpp');
 
 const AppError = require('./src/error/appError');
 const errorController = require('./src/error/errorController');
-const tourRouter = require('./src/tours/tourRoutes');
-const userRouter = require('./src/users/userRoutes');
-const reviewRouter = require('./src/reviews/reviewRoutes');
+const tourRouter = require('./src/tour/tourRoutes');
+const userRouter = require('./src/user/userRoutes');
+const reviewRouter = require('./src/review/reviewRoutes');
 
 const app = express();
 
