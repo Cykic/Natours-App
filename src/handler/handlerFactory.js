@@ -1,6 +1,7 @@
-const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
-const filterObj = require('../utils/filterObj');
+const catchAsync = require('../error/catchAsync');
+const AppError = require('../error/appError');
+const filterObj = require('../../utils/filterObj');
+const APIFeatures = require('../../utils/apiFeatures');
 
 // DELETE ONE
 exports.deleteOne = Model => {
@@ -63,6 +64,25 @@ exports.getOne = (Model, popOptions) =>
     });
   });
 
+// GET ALL
+exports.getAll = Model =>
+  catchAsync(async (req, res, next) => {
+    let filter = {};
+    if (req.params.tourId) filter = { tour: req.params.tourId };
+    const features = new APIFeatures(Model.find(filter), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const doc = await features.query;
+
+    // SEND RESPONSE
+    res.status(200).json({
+      status: 'success',
+      results: doc.length,
+      data: { data: doc }
+    });
+  });
 // C.R.U.D OF USER
 exports.updateUser = Model =>
   catchAsync(async (req, res, next) => {

@@ -1,19 +1,14 @@
-const User = require('./../models/userModel');
+const User = require('./userModel');
 // const APIFeatures = require('./../utils/apiFeatures');
-const catchAsync = require('./../utils/catchAsync');
 // const AppError = require('./../utils/appError');
-const factory = require('./handlerFactory');
+const factory = require('../handler/handlerFactory');
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      users
-    }
-  });
-});
+exports.getAllUsers = factory.getAll(User);
 
 exports.updateUser = factory.updateOne(User);
 

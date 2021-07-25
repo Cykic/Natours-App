@@ -6,11 +6,11 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 
-const AppError = require('./utils/appError');
-const globalErrorHandler = require('./controllers/errorController');
-const tourRouter = require('./routes/tourRoutes');
-const userRouter = require('./routes/userRoutes');
-const reviewRouter = require('./routes/reviewRoutes');
+const AppError = require('./src/error/appError');
+const errorController = require('./src/error/errorController');
+const tourRouter = require('./src/tours/tourRoutes');
+const userRouter = require('./src/users/userRoutes');
+const reviewRouter = require('./src/reviews/reviewRoutes');
 
 const app = express();
 
@@ -74,6 +74,6 @@ app.all('*', (req, _res, next) => {
 });
 
 // GLOBAL ERROR HANDLER
-app.use(globalErrorHandler);
+app.use(errorController);
 
 module.exports = app;

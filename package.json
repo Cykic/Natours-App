@@ -6,7 +6,9 @@
   "scripts": {
     "start": "nodemon server.js",
     "start:prod": "NODE_ENV=production nodemon server.js",
-    "debug": "ndb nodemon server.js"
+    "debug": "ndb nodemon server.js",
+    "kill":"pkill -f node"
+
   },
   "author": "Jonas Schmedtmann",
   "license": "ISC",
