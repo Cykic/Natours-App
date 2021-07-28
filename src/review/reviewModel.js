@@ -34,6 +34,8 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 reviewSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'user',
@@ -42,6 +44,17 @@ reviewSchema.pre(/^find/, function(next) {
 
   next();
 });
+
+reviewSchema.statics.calcAverage = function(tourId) {
+  this.aggregate([
+    { $match: { tour: tourId } },
+    {
+      $group: {
+        _id: '$tour'
+      }
+    }
+  ]);
+};
 
 const Review = mongoose.model('review', reviewSchema);
 
