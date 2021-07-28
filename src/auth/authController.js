@@ -2,10 +2,10 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
-const User = require('./../models/userModel');
-const catchAsync = require('./../utils/catchAsync');
-const AppError = require('./../utils/appError');
-const sendEmail = require('./../utils/email');
+const User = require('../user/userModel');
+const catchAsync = require('../error/catchAsync');
+const AppError = require('../error/appError');
+const sendEmail = require('../../utils/email');
 
 const generateToken = user =>
   jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -92,6 +92,7 @@ exports.protected = catchAsync(async (req, res, next) => {
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
+    // Check if the user role is part of the role that hass access to the next middleware
     if (!roles.includes(req.user.role)) {
       return next(
         new AppError('You do not have permission for this route', 403)

@@ -67,7 +67,7 @@ userSchema.pre('save', async function(next) {
   // is the password fiedl is not added skip
   if (!this.isModified('password')) return next();
 
-  // has password at cost
+  // hash password at cost
   this.password = await bcrypt.hash(this.password, 12);
   // makes confirmPassword field not added to the Database
   this.confirmPassword = undefined;
@@ -77,7 +77,7 @@ userSchema.pre('save', async function(next) {
 userSchema.methods.createPasswordResetToken = function() {
   // 1) Create random token
   const resetToken = crypto.randomBytes(32).toString('hex');
-  // 2) save hased token to database
+  // 2) save hased token to database of the user
   this.passwordResetToken = crypto
     .createHash('sha256')
     .update(resetToken)

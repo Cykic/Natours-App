@@ -6,7 +6,10 @@
   "scripts": {
     "start": "nodemon server.js",
     "start:prod": "NODE_ENV=production nodemon server.js",
-    "debug": "ndb nodemon server.js"
+    "debug": "ndb nodemon server.js",
+    "kill": "sudo pkill -f node",
+    "import": "node dev-data/data/import-dev-data.js --import",
+    "delete": "node dev-data/data/import-dev-data.js --delete"
   },
   "author": "Jonas Schmedtmann",
   "license": "ISC",

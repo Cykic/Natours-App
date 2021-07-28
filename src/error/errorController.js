@@ -1,4 +1,4 @@
-const AppError = require('./../utils/appError');
+const AppError = require('./appError');
 
 const handleCastErrorDB = err => {
   const message = `Invalid ${err.path}: ${err.value}.`;
@@ -23,7 +23,7 @@ const handlejwtError = () => {
 };
 
 const handlejwtExpiredError = () => {
-  return new AppError('Your Token has expired, Please login again, 401');
+  return new AppError('Your Token has expired, Please login again', 401);
 };
 // development error format
 const sendErrorDev = (err, res) => {
@@ -46,6 +46,7 @@ const sendErrorProd = (err, res) => {
     // Programming or other unknown error: don't leak error details
   } else {
     // 1) Log error
+    // eslint-disable-next-line no-console
     console.error('ERROR 💥', err);
 
     // 2) Send generic message
@@ -57,8 +58,6 @@ const sendErrorProd = (err, res) => {
 };
 
 module.exports = (err, _, res, _next) => {
-  // console.log(err.stack);
-
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
   // Logging error for production and development
@@ -67,6 +66,7 @@ module.exports = (err, _, res, _next) => {
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
 
+    // CREEATING SPECIFIC ERRORS DEPENDING ON SOURSE OF ERROR
     if (error.name === 'JsonWebTokenError') error = handlejwtError(error);
     if (error.name === 'TokenExpiredError')
       error = handlejwtExpiredError(error);

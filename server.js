@@ -12,10 +12,12 @@ process.on('uncaughtException', err => {
 dotenv.config({ path: './config.env' });
 const app = require('./app');
 
+// Database Connection
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD
 );
+
 mongoose
   .connect(DB, {
     useNewUrlParser: true,
@@ -28,6 +30,8 @@ mongoose
     console.log('DB connection successful!');
   });
 const port = process.env.PORT || 3000;
+
+// Starting Server
 const server = app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`App running on port ${port}...`);
