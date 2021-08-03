@@ -31,6 +31,9 @@ const sendLoginToken = (user, statuscode, res) => {
     token
   });
 };
+
+// SIGN UP
+
 exports.signup = catchAsync(async (req, res) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -45,6 +48,8 @@ exports.signup = catchAsync(async (req, res) => {
   // CREATED SUCCESSFUL
   sendLoginToken(newUser, 201, res);
 });
+
+// LOGIN
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
@@ -65,7 +70,21 @@ exports.login = catchAsync(async (req, res, next) => {
   sendLoginToken(user, 200, res);
 });
 
-exports.protected = catchAsync(async (req, res, next) => {
+// LOGOUT
+
+exports.logout = catchAsync(async (_req, res, _next) => {
+  res.cookie('jwt', 'logged out', {
+    expires: new Date(Date.now() + 1 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({
+    status: 'success'
+  });
+});
+
+// PROTECTED ROUTE
+
+exports.protected = catchAsync(async (req, _res, next) => {
   // Get token
   let token;
   if (
@@ -73,6 +92,8 @@ exports.protected = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookie.jwt) {
+    token = req.cookie.jwt;
   }
   if (!token)
     return next(
@@ -90,6 +111,8 @@ exports.protected = catchAsync(async (req, res, next) => {
   next();
 });
 
+// AUTHORIZATION
+
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     // Check if the user role is part of the role that hass access to the next middleware
@@ -102,6 +125,8 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+// FORGET PASSWORD
 
 exports.forgetpassword = catchAsync(async (req, res, next) => {
   // Find the email
@@ -137,6 +162,8 @@ exports.forgetpassword = catchAsync(async (req, res, next) => {
   }
 });
 
+// RESET PASSWORD
+
 exports.resetpassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on tokens
   const hashedToken = crypto
@@ -161,6 +188,8 @@ exports.resetpassword = catchAsync(async (req, res, next) => {
   // Log the user in send JWT
   sendLoginToken(user, 200, res);
 });
+
+// UPDATE PASSWORD
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1.) Get user
