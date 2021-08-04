@@ -18,7 +18,6 @@ const sendLoginToken = (user, statuscode, res) => {
     expires: new Date(
       Date.now() + process.env.JWT_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-
     httpOnly: true
   };
 
@@ -42,8 +41,6 @@ exports.signup = catchAsync(async (req, res) => {
     confirmPassword: req.body.confirmPassword,
     role: req.body.role
   });
-
-  // creating JWT for signup userModel
 
   // CREATED SUCCESSFUL
   sendLoginToken(newUser, 201, res);
@@ -84,7 +81,7 @@ exports.logout = catchAsync(async (_req, res, _next) => {
 
 // PROTECTED ROUTE
 
-exports.protected = catchAsync(async (req, _res, next) => {
+exports.protected = catchAsync(async (req, res, next) => {
   // Get token
   let token;
   if (
@@ -92,14 +89,12 @@ exports.protected = catchAsync(async (req, _res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
-  } else if (req.cookie.jwt) {
-    token = req.cookie.jwt;
   }
+
   if (!token)
     return next(
       new AppError('You are not Logged in, Login to get access', 401)
     );
-
   // Verify token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   const freshUser = await User.findById(decoded.id);
@@ -121,7 +116,6 @@ exports.restrictTo = (...roles) => {
         new AppError('You do not have permission for this route', 403)
       );
     }
-
     next();
   };
 };
@@ -145,7 +139,7 @@ exports.forgetpassword = catchAsync(async (req, res, next) => {
   try {
     await sendEmail({
       email: user.email,
-      subject: 'Your password rest token valid for 10min',
+      subject: 'Your password rest token valid for 10 min',
       message
     });
 
@@ -157,7 +151,6 @@ exports.forgetpassword = catchAsync(async (req, res, next) => {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
-
     return next(new AppError('There was an error while sending mail', 500));
   }
 });
