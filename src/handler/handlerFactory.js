@@ -21,8 +21,11 @@ exports.updateOne = Model =>
   catchAsync(async (req, res, next) => {
     console.log(req.file);
     console.log(req.body);
+    const filteredBody = filterObj(req.body, 'name', 'email');
 
-    const doc = await Model.findByIdAndUpdate(req.user.id, req.body, {
+    if (req.file) filteredBody.photo = req.file.filename;
+
+    const doc = await Model.findByIdAndUpdate(req.user.id, filteredBody, {
       new: true,
       runValidators: true
     });
@@ -97,7 +100,6 @@ exports.updateUser = Model =>
     // 2.) Get user by id
     const filteredBody = filterObj(req.body, 'name', 'email');
 
-    if (req.file) filteredBody.photo = req.file.filename;
     const updatedUser = await Model.findByIdAndUpdate(
       req.user.id,
       filteredBody,
