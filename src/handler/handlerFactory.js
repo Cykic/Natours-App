@@ -19,9 +19,13 @@ exports.deleteOne = Model => {
 // UPDATE ONE
 exports.updateOne = Model =>
   catchAsync(async (req, res, next) => {
-    console.log(req.file);
-    console.log(req.body);
-    const filteredBody = filterObj(req.body, 'name', 'email');
+    const filteredBody = filterObj(
+      req.body,
+      'name',
+      'email',
+      'imageCover',
+      'images'
+    );
 
     if (req.file) filteredBody.photo = req.file.filename;
 
