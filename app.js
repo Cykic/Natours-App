@@ -6,6 +6,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const compression = require('compression');
+const cors = require('cors');
 
 const AppError = require('./src/error/appError');
 const errorController = require('./src/error/errorController');
@@ -48,6 +49,7 @@ app.use(
   })
 );
 
+app.use(cors());
 app.use(compression());
 
 // Serving Static files
