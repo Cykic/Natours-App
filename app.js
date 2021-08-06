@@ -7,6 +7,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const compression = require('compression');
 const cors = require('cors');
+const docRouter = require('./src/handler/docRoute');
 
 const AppError = require('./src/error/appError');
 const errorController = require('./src/error/errorController');
@@ -70,6 +71,7 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // 3) ROUTES TO END POINTS
+app.use('/', docRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
