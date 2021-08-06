@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const compression = require('compression');
 
 const AppError = require('./src/error/appError');
 const errorController = require('./src/error/errorController');
@@ -46,6 +47,8 @@ app.use(
     ]
   })
 );
+
+app.use(compression());
 
 // Serving Static files
 app.use(express.static(`${__dirname}/public`));
