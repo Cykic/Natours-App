@@ -6,7 +6,7 @@ const router = express.Router();
 router.all(
   '/',
   catchAsync(async (req, res, next) => {
-    res.redirect('https://documenter.getpostman.com/view/15984587/TzsbKSho');
+    res.redirect('https://documenter.getpostman.com/view/15984587/TzsimQPH');
   })
 );
 
