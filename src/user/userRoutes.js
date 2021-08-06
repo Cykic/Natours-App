@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
+router.get('/logout', authController.logout);
 router.post('/forgetpassword', authController.forgetpassword);
 router.patch('/resetpassword/:token', authController.resetpassword);
 
@@ -16,7 +17,12 @@ router.patch('/updatePassword', authController.updatePassword);
 
 router.route('/getMe').get(userController.getMe, userController.getUser);
 
-router.patch('/updateMe', userController.updateUser);
+router.patch(
+  '/updateMe',
+  userController.uploadUserPhoto,
+  userController.resizeUserPhoto,
+  userController.updateUser
+);
 
 router.delete('/deleteMe', userController.deleteUser);
 

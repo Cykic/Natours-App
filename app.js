@@ -11,6 +11,7 @@ const errorController = require('./src/error/errorController');
 const tourRouter = require('./src/tour/tourRoutes');
 const userRouter = require('./src/user/userRoutes');
 const reviewRouter = require('./src/review/reviewRoutes');
+const bookingRouter = require('./src/booking/bookingRoutes');
 
 const app = express();
 
@@ -67,6 +68,7 @@ app.use('/api', limiter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 // ERROR PAGE 404
 app.all('*', (req, _res, next) => {

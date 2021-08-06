@@ -5,7 +5,7 @@ const { promisify } = require('util');
 const User = require('../user/userModel');
 const catchAsync = require('../error/catchAsync');
 const AppError = require('../error/appError');
-const sendEmail = require('../../utils/email');
+const Email = require('../../utils/email');
 
 const generateToken = user =>
   jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -18,7 +18,6 @@ const sendLoginToken = (user, statuscode, res) => {
     expires: new Date(
       Date.now() + process.env.JWT_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-
     httpOnly: true
   };
 
@@ -31,6 +30,9 @@ const sendLoginToken = (user, statuscode, res) => {
     token
   });
 };
+
+// SIGN UP
+
 exports.signup = catchAsync(async (req, res) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -40,11 +42,15 @@ exports.signup = catchAsync(async (req, res) => {
     role: req.body.role
   });
 
-  // creating JWT for signup userModel
+  const url = `${req.protocol}://${req.get('host')}/me`;
+  // Send welcome Email
+  await new Email(newUser, url).sendWelcome();
 
   // CREATED SUCCESSFUL
   sendLoginToken(newUser, 201, res);
 });
+
+// LOGIN
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
@@ -65,6 +71,20 @@ exports.login = catchAsync(async (req, res, next) => {
   sendLoginToken(user, 200, res);
 });
 
+// LOGOUT
+
+exports.logout = catchAsync(async (_req, res, _next) => {
+  res.cookie('jwt', 'logged out', {
+    expires: new Date(Date.now() + 1 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({
+    status: 'success'
+  });
+});
+
+// PROTECTED ROUTE
+
 exports.protected = catchAsync(async (req, res, next) => {
   // Get token
   let token;
@@ -74,11 +94,11 @@ exports.protected = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1];
   }
+
   if (!token)
     return next(
       new AppError('You are not Logged in, Login to get access', 401)
     );
-
   // Verify token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   const freshUser = await User.findById(decoded.id);
@@ -90,6 +110,8 @@ exports.protected = catchAsync(async (req, res, next) => {
   next();
 });
 
+// AUTHORIZATION
+
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     // Check if the user role is part of the role that hass access to the next middleware
@@ -98,10 +120,11 @@ exports.restrictTo = (...roles) => {
         new AppError('You do not have permission for this route', 403)
       );
     }
-
     next();
   };
 };
+
+// FORGET PASSWORD
 
 exports.forgetpassword = catchAsync(async (req, res, next) => {
   // Find the email
@@ -111,18 +134,14 @@ exports.forgetpassword = catchAsync(async (req, res, next) => {
   // Generate randon token
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
-  // send token to email
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/users/resetpassword/${resetToken}`;
 
-  const message = `Forgot your password? Submit a PATCH request with your new passowrd and passwordConfirm to ${resetURL}`;
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password rest token valid for 10min',
-      message
-    });
+    // send token to email
+    const resetURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/v1/users/resetpassword/${resetToken}`;
+    // use created Email class to send email
+    await new Email(user, resetURL).sendPasswordReset();
 
     res.status(200).json({
       status: 'success',
@@ -132,10 +151,11 @@ exports.forgetpassword = catchAsync(async (req, res, next) => {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
-
     return next(new AppError('There was an error while sending mail', 500));
   }
 });
+
+// RESET PASSWORD
 
 exports.resetpassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on tokens
@@ -161,6 +181,8 @@ exports.resetpassword = catchAsync(async (req, res, next) => {
   // Log the user in send JWT
   sendLoginToken(user, 200, res);
 });
+
+// UPDATE PASSWORD
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1.) Get user

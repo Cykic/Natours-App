@@ -63,8 +63,10 @@ module.exports = (err, _, res, _next) => {
   // Logging error for production and development
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
-  } else if (process.env.NODE_ENV === 'production') {
+  }
+  if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
+    error.message = err.message;
 
     // CREEATING SPECIFIC ERRORS DEPENDING ON SOURSE OF ERROR
     if (error.name === 'JsonWebTokenError') error = handlejwtError(error);
