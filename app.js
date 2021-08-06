@@ -8,7 +8,6 @@ const hpp = require('hpp');
 const compression = require('compression');
 const cors = require('cors');
 
-
 const AppError = require('./src/error/appError');
 const errorController = require('./src/error/errorController');
 const tourRouter = require('./src/tour/tourRoutes');
@@ -52,7 +51,6 @@ app.use(
 
 app.use(cors());
 app.use(compression());
-
 
 // Serving Static files
 app.use(express.static(`${__dirname}/public`));
