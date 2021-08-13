@@ -8,7 +8,6 @@
     "consistent-return": "off",
     "func-names": "off",
     "object-shorthand": "off",
-    "no-process-exit": "off",
     "no-param-reassign": "off",
     "no-return-await": "off",
     "no-underscore-dangle": "off",
