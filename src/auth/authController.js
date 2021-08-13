@@ -83,7 +83,7 @@ exports.logout = catchAsync(async (_req, res, _next) => {
   });
 });
 
-// PROTECTED ROUTE
+// PROTECTED ROUTES
 
 exports.protected = catchAsync(async (req, res, next) => {
   // Get token
