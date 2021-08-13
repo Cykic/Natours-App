@@ -6,7 +6,7 @@ const User = require('../user/userModel');
 const catchAsync = require('../error/catchAsync');
 const AppError = require('../error/appError');
 const Email = require('../../utils/email');
-
+// imports
 const generateToken = user =>
   jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRATION
