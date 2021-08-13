@@ -166,7 +166,9 @@ exports.resetpassword = catchAsync(async (req, res, next) => {
 
   const user = await User.findOne({
     passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() }
+    passwordResetExpires: {
+      $gt: Date.now() 
+                          }
   });
   // 2) if token expires
   if (!user) {
