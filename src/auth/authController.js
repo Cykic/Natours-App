@@ -94,7 +94,7 @@ exports.protected = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1];
   }
-
+  // Cookie for token
   token = req.headers.cookie.split('=')[1];
   if (!token)
     return next(
