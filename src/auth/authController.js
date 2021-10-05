@@ -26,8 +26,8 @@ const sendLoginToken = (user, statuscode, res) => {
   res.cookie('jwt', token, cookieOption);
 
   res.status(statuscode).json({
-    status: 'success',
-    token
+    status: 'success'
+    // token
   });
 };
 
@@ -95,6 +95,7 @@ exports.protected = catchAsync(async (req, res, next) => {
     token = req.headers.authorization.split(' ')[1];
   }
 
+  token = req.headers.cookie.split('=')[1];
   if (!token)
     return next(
       new AppError('You are not Logged in, Login to get access', 401)
