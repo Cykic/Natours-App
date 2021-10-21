@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: natours-api
+  labels:
+    app: natours
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: natours
+  template:
+    metadata:
+      labels:
+        app: natours
+    spec:
+      containers:
+        - name: natours
+          image: cykic/natours-api
+          ports:
+            - containerPort: 3000
